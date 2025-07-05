@@ -1,0 +1,100 @@
+🧠 What You’ll Build:
+Authenticated users can:
+/ route -> all notes
+/createNote route -> ✅ Add notes
+/editNote route -> ✏️ Edit notes
+/deleteNote route -> 🗑️ Delete notes
+
+📃 View all notes (CRUD)
+Each note will have:
+Title, content, createdAt, updatedAt
+Connect notes to specific users
+
+
+Frontend ->	React + Axios + Context AP
+Backend	-> Node.js + Express
+Database	-> MongoDB + Mongoose
+Auth	-> JWT + bcrypt
+Deployment ->	(optional later)
+
+
+folder structure
+/Backend
+controllers/
+  note.controller.js
+  user.controller.js
+models/
+  note.model.js
+  user.model.js
+routes/
+  note.routes.js //routes - createNote,editNote,deleteNote,show all of particular user
+  user.routes.js //routes - login,register
+middleware/
+  auth.js //for jwt header checking
+config/
+  db.js //for Connection of MongoDB
+server.js
+.env //jwt secret key
+
+
+/Frontend
+components/
+  Navbar.jsx
+  NoteForm.jsx
+  NoteList.jsx
+pages/
+  Login.jsx
+  Register.jsx
+  Dashboard.jsx
+services/
+  noteService.js
+  authService.js
+context/
+  AuthContext.jsx
+App.jsx
+main.jsx
+
+
+day By day Plan
+
+🛠 Step-by-Step Plan
+Day 1 — MVP Plan
+Backend
+ User Model (username, email, password)
+ Note Model (user, title, content, timestamps)
+ Auth Routes (register/login with bcrypt + JWT)
+ Note Routes (CRUD, JWT protected)
+
+Frontend
+ AuthContext
+ Login & Register forms
+ Create Note + List Notes
+ Edit/Delete Notes
+
+
+//note modelconst mongoose = require("mongoose");
+
+const noteSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  title: String,
+  content: String,
+}, { timestamps: true });
+
+module.exports = mongoose.model("Note", noteSchema);
+
+
+
+🚀 Bonus Features (Optional)
+Search notes by title/content
+Rich text editing (with Quill)
+Tags or categories
+Pin/Archive notes
+
+all notes route - id(user) GET
+create route - title, content, id(user) POST
+delete route - id(note id) POST
+edit - id(note id), title, content (all should be updated ones) POST
