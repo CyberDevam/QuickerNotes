@@ -169,7 +169,7 @@ const Navbar = ({ mode, toggleMode }) => {
               </button>
 
               {/* Profile Avatar - Always visible */}
-              <Link to={`/profile?id=${currentUser._id}`} className="flex-shrink-0">
+              {currentUser && <Link to={`/profile?id=${currentUser._id}`} className="flex-shrink-0">
                 <div className={`w-8 h-8 flex items-center justify-center rounded-full font-medium transition-colors ${
                   mode === 'dark' 
                     ? 'bg-emerald-600 text-white hover:bg-emerald-700' 
@@ -177,7 +177,7 @@ const Navbar = ({ mode, toggleMode }) => {
                 }`}>
                   {currentUser.name.charAt(0).toUpperCase()}
                 </div>
-              </Link>
+              </Link>}
             </div>
           )}
         </div>
