@@ -89,7 +89,7 @@ const Navbar = ({ mode, toggleMode }) => {
             </button>
           </div>
 
-          <div className="mt-auto pt-4 border-t border-gray-200">
+          {currentUser && <div className="mt-auto pt-4 border-t border-gray-200">
             <Link 
               to={`/profile?id=${currentUser._id}`} 
               className="flex items-center p-3 hover:bg-gray-100 rounded-lg transition-colors"
@@ -107,7 +107,7 @@ const Navbar = ({ mode, toggleMode }) => {
                 <p className="text-sm text-gray-500">{currentUser.email}</p>
               </div>
             </Link>
-          </div>
+          </div>}
         </div>
       </div>
 
