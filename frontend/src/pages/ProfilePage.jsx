@@ -28,23 +28,28 @@ const ProfilePage = ({ mode = 'light' }) => {
     }
   }, []);
   useEffect(() => {
-    const identifyUser = async () => {
-      const currentUser = await axios.get("http://localhost:3000/auth/" + id);
-      if (currentUser.data.isMe) {
-        setFormData({
-          name: currentUser.data.name,
-          email: currentUser.data.email,
-          currentPassword: '',
-          newPassword: '',
-          confirmPassword: ''
-        })
+    if (id) {
+      const identifyUser = async () => {
+        const currentUser = await axios.get("http://localhost:3000/auth/" + id);
+        if (currentUser.data.isMe) {
+          setFormData({
+            name: currentUser.data.name,
+            email: currentUser.data.email,
+            currentPassword: '',
+            newPassword: '',
+            confirmPassword: ''
+          })
+        }
+        else {
+          toast.error("There is some Error");
+          navigate("/");
+        }
       }
-      else {
-        toast.error("There is some Error");
-        navigate("/");
-      }
+      identifyUser();
+    } else {
+      toast.error("No note selected for editing. Redirecting...");
+      navigate("/");
     }
-    identifyUser();
   }, [])
 
   const [formData, setFormData] = useState({
@@ -75,7 +80,7 @@ const ProfilePage = ({ mode = 'light' }) => {
       });
       if (response.status == 200) {
         toast.success("Profile Updated Successfully");
-        window.location.reload();
+        navigate("/")
       } else {
         toast.error("There is some error");
       }

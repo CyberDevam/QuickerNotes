@@ -36,7 +36,12 @@ const EditNote = ({ mode, toggleMode }) => {
       }
     };
 
-    if (noteId) fetchNote();
+    if (noteId) {
+      fetchNote();
+    } else {
+      toast.error("No note selected for editing. Redirecting...");
+      navigate("/");
+    }
   }, [navigate, noteId]);
 
   const handleTextSelection = () => {
