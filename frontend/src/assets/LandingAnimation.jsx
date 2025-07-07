@@ -22,8 +22,8 @@ const LandingAnimation = ({ mode }) => {
       {showAnimation && (
         <motion.div
           className={`w-screen h-screen flex items-center justify-center ${bgClass} fixed top-0 left-0 z-50`}
-          initial={{ opacity: 0 }} //scale: 0.2 
-          animate={{ opacity: 1 }} //scale: 1
+          initial={{ opacity: 1 }} //scale: 0.2 
+          animate={{ opacity: 2 }} //scale: 1
           exit={{ opacity: 0 }} //scale: 1.1
           transition={{ duration: 1.2 }}
         >

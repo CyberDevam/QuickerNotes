@@ -8,6 +8,11 @@ const noteSchema = new mongoose.Schema({
   },
   title: String,
   content: String,
+  category: {
+    type: String,
+    enum: ["public", "private"],
+    default: "private"
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model("Note", noteSchema);

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/user.model');
 const bcrypt = require('bcrypt');
+const userModel = require('../models/user.model');
 // const jwt = require("jsonwebtoken");
 //identify me
 router.get("/:id", async (req, res) => {
@@ -14,6 +15,90 @@ router.get("/:id", async (req, res) => {
     res.status(200).json({ isMe: true, email: user.email, name: user.name });
   } catch (error) {
     res.status(500).json(error);
+  }
+});
+// New route to get user details
+router.get("/user/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id)
+      .select("username") // Only return username
+      .lean();
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+// Pallete
+router.post("/palette/:id", async (req, res) => {
+  const id = req.params.id;
+  const { category, palette } = req.body;
+  try {
+    const user = await User.findByIdAndUpdate(
+      id,
+      { palette: { category, palette } },
+      { new: true, runValidators: true }
+    );
+    if (!user) {
+      return res.status(400).json({ palette: {} });
+    }
+    res.status(200).json({ palette: user.palette, name: user.name });
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+// Set mode
+router.post("/mode/:id", async (req, res) => {
+  const id = req.params.id;
+  const { mode } = req.body;
+  if (!mode) {
+    return res.status(400).json({ message: "Mode is required" });
+  }
+  try {
+    const user = await User.findByIdAndUpdate(
+      id,
+      { mode },
+      { new: true, runValidators: true }
+    );
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json({ mode: user.mode });
+  } catch (error) {
+    res.status(500).json({ message: "Error setting mode", error });
+  }
+});
+// Get mode
+router.get("/mode/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const user = await User.findById(id);
+    if (!user || typeof user.mode === "undefined") {
+      return res.status(404).json({ message: "Mode not found" });
+    }
+    res.status(200).json({ mode: user.mode });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching mode", error });
+  }
+});
+// get palette color and category
+router.get("/palette/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const user = await User.findById(id);
+    if (!user || !user.palette) {
+      return res.status(404).json({ message: "Palette not found" });
+    }
+    res.status(200).json({
+      category: user.palette.category,
+      palette: user.palette.palette
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching palette", error });
   }
 });
 //profile update
@@ -44,6 +129,23 @@ router.put("/profile/:id", async (req, res) => {
     res.status(500).json({ message: "Error updating profile", error });
   }
 });
+// edit name and email
+router.put("/profile/:name/:email", async (req, res) => {
+  const { name, email } = req.params;
+  const { id } = req.body;
+  if (!name || !email || !id) return res.status(400).json({ message: "all fields are required" });
+  try {
+    const user = await userModel.findByIdAndUpdate(
+      id,
+      { name, email },
+      { new: true, runValidators: true }
+    );
+    if (!user) return res.status(400).json({ message: "user not found" });
+    res.status(200).json({ message: "Profile updated successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating profile", error });
+  }
+});
 // Login
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
@@ -55,7 +157,7 @@ router.post("/login", async (req, res) => {
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
-    // const token = jwt.sign(newUser._id, process.env.JWT_SECRET_KEY, { expiresIn: "9h" });
+    // const token = jwt.sign(newUser._id, process.env.JWT_SECRET_KEY, { expiresIn: "7d" });
     res.status(200).json(user);
   } catch (error) {
     res.status(400).json({ error })
@@ -77,10 +179,10 @@ router.post("/register", async (req, res) => {
     email,
     password: hashPassword,
   });
-  if(!newUser){
-    return res.status(400).json({message:"user created failed"});
+  if (!newUser) {
+    return res.status(400).json({ message: "user created failed" });
   }
-  // const token = jwt.sign(newUser._id, process.env.JWT_SECRET_KEY, { expiresIn: "9h" });
+  // const token = jwt.sign(newUser._id, process.env.JWT_SECRET_KEY, { expiresIn: "7d" });
   res.status(200).json(newUser);
 })
 // Logout
