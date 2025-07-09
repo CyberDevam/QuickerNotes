@@ -253,14 +253,14 @@ const ProfilePage = ({ mode = 'light' }) => {
             <button
               onClick={nameAndEmail}
               type="button"
-              className={`w-full h-12 py-2 px-4 ${mode === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'
+              className={`w-full h-12 text-sm py-2 px-4 ${mode === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'
                 } text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-500`}
             >
               Name Or Email
             </button>
             <button
               type="submit"
-              className={`w-full h-12 py-2 px-4 ${mode === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'
+              className={`w-full h-12 text-sm py-2 px-4 ${mode === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'
                 } text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-500`}
             >
               OK
