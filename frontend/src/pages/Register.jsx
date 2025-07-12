@@ -22,6 +22,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    console.log(name,email,password,gender)
     if (!name || !email || !password || !gender) {
       toast.error("All Credentials Are Required");
     }
