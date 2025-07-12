@@ -104,7 +104,10 @@ const EditNote = ({ mode, toggleMode }) => {
   };
 
   return (
-    <div className={`min-h-[95vh] flex justify-center items-start pt-10 ${mode === "dark" ? "bg-gray-900" : "bg-gray-100"} px-4`}>
+    <div style={{
+      borderTopLeftRadius: "10px",
+      borderTopRightRadius: "10px"
+    }} className={`min-h-[95vh] flex justify-center items-start pt-10 ${mode === "dark" ? "bg-gray-900" : "bg-gray-100"} px-4`}>
       <BackButton mode={mode} />
       <div className={`p-8 shadow-md rounded-xl w-full max-w-2xl ${mode === "dark" ? "bg-gray-800 border border-gray-700" : "bg-white border border-gray-200"}`}>
         <h2 className={`text-3xl font-bold mb-6 text-center ${mode === "dark" ? "text-green-400" : "text-green-600"}`}>

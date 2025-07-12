@@ -16,6 +16,7 @@ import LandingPage from "./pages/LandingPage";
 import LearnMore from "./pages/LearnMore";
 import NotFound from "./pages/NotFound";
 import GlobalNotes from "./pages/GlobalNotes";
+import Following from "./pages/Following";
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -101,7 +102,7 @@ const App = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setLandingAnimation(false);
-    }, 1500);
+    }, 2500);
     return () => clearTimeout(timer);
   }, []);
 
@@ -141,6 +142,8 @@ const App = () => {
             <Route path="/edit" element={<EditNote mode={mode} />} />
             <Route path="/view" element={<ViewNote mode={mode} />} />
             <Route path="/profile" element={<ProfilePage mode={mode} />} />
+            <Route path={`/users/followers`} element={<ProfilePage mode={mode} />} />
+            <Route path={`/users/following`} element={<Following mode={mode} />} />
             <Route
               path="*"
               element={<NotFound/>}

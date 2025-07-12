@@ -1,30 +1,48 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import axios from "axios";
+import { IdentifyMe } from "../Routes/apiRoutes";
 
 const Navbar = ({ mode, toggleMode }) => {
   const navigate = useNavigate();
   const currentUser = JSON.parse(localStorage.getItem("currentUser"));
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const [name, setName] = useState("");
+  const [userName, setUserName] = useState(currentUser?.name || "");
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
-      // Close mobile menu when resizing to desktop
       if (window.innerWidth >= 768) {
         setMobileMenuOpen(false);
       }
-      async function namee() {
-        const response = await axios.get("http://localhost:3000/auth/" + currentUser._id);
-        (response.status == 200) ? setName(response.data.name) : currentUser.name;
-      }
-      namee()
     };
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      if (currentUser?._id) {
+        try {
+          const response = await axios.get(`${IdentifyMe}${currentUser._id}`);
+          if (response.status === 200 && response.data.name) {
+            setUserName(response.data.name);
+          }
+        } catch (error) {
+          console.error("Error fetching user name:", error);
+          // Fallback to localStorage name if API fails
+          if (currentUser?.name) {
+            setUserName(currentUser.name);
+          }
+        }
+      }
+    };
+
+    fetchUserName();
+  }, [currentUser]);
 
   const handleLogout = () => {
     localStorage.removeItem("currentUser");
@@ -59,9 +77,9 @@ const Navbar = ({ mode, toggleMode }) => {
               exit="exit"
               variants={mobileSidebarVariants}
               transition={{ type: "tween", ease: "easeInOut", duration: 0.3 }}
-              className="fixed top-0 left-0 w-64 h-full bg-white z-50 shadow-xl md:hidden dark:bg-gray-800"
+              className={`fixed top-0 left-0 w-64 h-full bg-white z-50 shadow-xl md:hidden dark:bg-gray-800`}
             >
-              <div className="p-4 flex flex-col h-full">
+              <div className={`p-4 flex flex-col h-full ${mode === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
                 <div className="flex items-center justify-between mb-8">
                   <Link
                     to="/"
@@ -77,7 +95,7 @@ const Navbar = ({ mode, toggleMode }) => {
                   </Link>
                   <button
                     onClick={() => setMobileMenuOpen(false)}
-                    className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700"
+                    className={`p-2 rounded-full transition-colors ${mode === 'dark' ? 'text-gray-300 hover:text-white hover:bg-gray-700' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}`}
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -89,7 +107,7 @@ const Navbar = ({ mode, toggleMode }) => {
                   {currentUser && (
                     <Link
                       to="/global"
-                      className="flex items-center p-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors font-bold text-lg dark:text-gray-200 dark:hover:text-white dark:hover:bg-gray-700"
+                      className={`flex items-center p-3 rounded-lg transition-colors font-bold text-lg ${mode === 'dark' ? 'text-gray-200 hover:text-white hover:bg-gray-700' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}`}
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       <svg className="w-5 h-5 mr-3 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -101,7 +119,7 @@ const Navbar = ({ mode, toggleMode }) => {
 
                   <Link
                     to="setting"
-                    className="flex items-center p-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700"
+                    className={`flex items-center p-3 rounded-lg transition-colors ${mode === 'dark' ? 'text-gray-300 hover:text-white hover:bg-gray-700' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -113,7 +131,7 @@ const Navbar = ({ mode, toggleMode }) => {
 
                   <button
                     onClick={toggleMode}
-                    className="flex items-center cursor-pointer p-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700"
+                    className={`flex items-center cursor-pointer p-3 rounded-lg transition-colors ${mode === 'dark' ? 'text-gray-300 hover:text-white hover:bg-gray-700' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}`}
                   >
                     <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       {mode === "light" ? (
@@ -127,7 +145,7 @@ const Navbar = ({ mode, toggleMode }) => {
 
                   <button
                     onClick={handleLogout}
-                    className="flex items-center p-3 cursor-pointer text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700"
+                    className={`flex items-center p-3 cursor-pointer rounded-lg transition-colors ${mode === 'dark' ? 'text-gray-300 hover:text-white hover:bg-gray-700' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}`}
                   >
                     <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -137,25 +155,23 @@ const Navbar = ({ mode, toggleMode }) => {
                 </div>
 
                 {currentUser && (
-                  <div className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <div className={`mt-auto pt-4 ${mode === 'dark' ? 'border-gray-700' : 'border-gray-200'} border-t`}>
                     <Link
                       to={`/profile?id=${currentUser._id}`}
-                      className="flex items-center p-3 hover:bg-gray-100 rounded-lg transition-colors dark:hover:bg-gray-700"
+                      className={`flex items-center p-3 rounded-lg transition-colors ${mode === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       <div
-                        className={`w-8 h-8 flex items-center justify-center rounded-full font-medium mr-3 ${mode === "dark"
-                            ? "bg-emerald-600 text-white"
-                            : "bg-emerald-100 text-emerald-600"
+                        className={`w-8 h-8 flex items-center justify-center rounded-full font-medium mr-3 ${mode === "dark" ? "bg-emerald-600 text-white" : "bg-emerald-100 text-emerald-600"
                           }`}
                       >
-                        {currentUser.name.charAt(0).toUpperCase()}
+                        {userName.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <p className="font-medium dark:text-gray-200">
-                          {currentUser.name}
+                        <p className={`font-medium ${mode === 'dark' ? 'text-gray-200' : ''}`}>
+                          {userName}
                         </p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <p className={`text-sm ${mode === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                           {currentUser.email}
                         </p>
                       </div>
@@ -170,7 +186,7 @@ const Navbar = ({ mode, toggleMode }) => {
 
       {/* Main Navbar */}
       <nav
-        className={`bg-white/80 backdrop-blur-sm border-b border-gray-100 px-4 py-3 w-full fixed top-0 left-0 right-0 z-30 ${mode === "dark" ? "dark:bg-gray-800/80 dark:border-gray-700" : ""
+        className={`${mode === "dark" ? "bg-black/80" : "bg-white/80"} backdrop-blur-sm border-b border-gray-100 px-4 py-3 w-full fixed top-0 left-0 right-0 z-30 ${mode === "dark" ? "dark:bg-gray-800/80 dark:border-gray-700" : ""
           }`}
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -183,7 +199,7 @@ const Navbar = ({ mode, toggleMode }) => {
                 className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700"
               >
                 <svg
-                  className="w-5 h-5"
+                  className={`w-5 h-5 ${mode === "dark" ? "text-white" : "text-gray-600"}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -234,7 +250,7 @@ const Navbar = ({ mode, toggleMode }) => {
             >
               <Link
                 to="/global"
-                className="font-bold text-gray-700 text-lg relative group dark:text-gray-200"
+                className={`font-bold text-xl ${mode === "dark" ? "text-gray-100" : "text-gray-700"} text-lg relative group dark:text-gray-200`}
               >
                 Global
                 <span className="text-emerald-600 dark:text-emerald-400">
@@ -258,7 +274,7 @@ const Navbar = ({ mode, toggleMode }) => {
             <div className="flex items-center space-x-4">
               <Link
                 to="setting"
-                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700"
+                className={`${mode === "dark" ? "hover:text-gray-900 bg-white" : "hover:bg-gray-100"} p-2 text-gray-600   rounded-full transition-colors dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700`}
               >
                 <svg
                   className="w-5 h-5"
@@ -282,7 +298,7 @@ const Navbar = ({ mode, toggleMode }) => {
 
               <button
                 onClick={toggleMode}
-                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700"
+                className={`${mode === "dark" ? "hover:text-gray-900 bg-white" : "hover:bg-gray-100"} p-2 text-gray-600   rounded-full transition-colors dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700`}
               >
                 {mode === "light" ? (
                   <svg
@@ -317,7 +333,7 @@ const Navbar = ({ mode, toggleMode }) => {
 
               <button
                 onClick={handleLogout}
-                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700"
+                className={`${mode === "dark" ? "hover:text-gray-900 bg-white" : "hover:bg-gray-100"} p-2 text-gray-600   rounded-full transition-colors dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700`}
               >
                 <svg
                   className="w-5 h-5"
@@ -341,11 +357,11 @@ const Navbar = ({ mode, toggleMode }) => {
               >
                 <div
                   className={`w-8 h-8 flex items-center justify-center rounded-full font-medium transition-colors ${mode === "dark"
-                      ? "bg-emerald-600 text-white hover:bg-emerald-700"
-                      : "bg-emerald-100 text-emerald-600 hover:bg-emerald-200"
+                    ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                    : "bg-emerald-100 text-emerald-600 hover:bg-emerald-200"
                     }`}
                 >
-                  {currentUser.name.charAt(0).toUpperCase()}
+                  {userName.charAt(0).toUpperCase()}
                 </div>
               </Link>
             </div>

@@ -12,7 +12,7 @@ router.get("/:id", async (req, res) => {
     if (!user) {
       return res.status(400).json({ isMe: false });
     }
-    res.status(200).json({ isMe: true, email: user.email, name: user.name });
+    res.status(200).json({ isMe: true, email: user.email, name: user.name, _id: user._id, avatarImg: user.avatarImg, gender: user.gender });
   } catch (error) {
     res.status(500).json(error);
   }
@@ -21,13 +21,11 @@ router.get("/:id", async (req, res) => {
 router.get("/user/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id)
-      .select("username") // Only return username
-      .lean();
+      .select("-password -palette -mode -email")
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-
     res.status(200).json(user);
   } catch (err) {
     res.status(500).json({ error: "Server error" });
@@ -101,6 +99,19 @@ router.get("/palette/:id", async (req, res) => {
     res.status(500).json({ message: "Error fetching palette", error });
   }
 });
+// set profile avatar
+router.get("/avatar/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { avatarImg } = req.body;
+    if (!id || !avatarImg) return res.status(400).json({ message: "id or avatarImg is empty" });
+    const user = await userModel.findByIdAndUpdate(id, { avatarImg }, { new: true }).select("-password -email -mode -palette");
+    if (!user) return res.status(400).json({ message: "user not found" });
+    return res.status(200).json({ user })
+  } catch (error) {
+    return res.status(400).json(error);
+  }
+});
 //profile update
 router.put("/profile/:id", async (req, res) => {
   const id = req.params.id;
@@ -165,8 +176,8 @@ router.post("/login", async (req, res) => {
 });
 // Register
 router.post("/register", async (req, res) => {
-  const { name, email, password } = req.body;
-  if (!name && !email && !password) {
+  const { name, email, password, gender } = req.body;
+  if (!name && !email && !password && !gender) {
     return res.status(400).json({ message: "fields are empty" })
   }
   const isExisted = await User.findOne({ email });
@@ -178,13 +189,14 @@ router.post("/register", async (req, res) => {
     name,
     email,
     password: hashPassword,
+    gender
   });
   if (!newUser) {
     return res.status(400).json({ message: "user created failed" });
   }
   // const token = jwt.sign(newUser._id, process.env.JWT_SECRET_KEY, { expiresIn: "7d" });
   res.status(200).json(newUser);
-})
+});
 // Logout
 router.get("/logout", async (req, res) => {
   try {
@@ -192,6 +204,43 @@ router.get("/logout", async (req, res) => {
   } catch (error) {
     res.status(400).json({ message: "Logout Unsuccessfull" })
   }
-})
+});
+router.post('/:userId/follow', async (req, res) => {
+  try {
+    const userToFollow = await User.findById(req.params.userId);
+    const currentUser = await User.findById(req.body.currentUserId);
+
+    if (!userToFollow || !currentUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    await currentUser.follow(userToFollow._id);
+    await userToFollow.updateOne({ $push: { followers: currentUser._id } });
+
+    res.json({ message: 'Successfully followed user' });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Unfollow a user
+router.post('/:userId/unfollow', async (req, res) => {
+  try {
+    const userToUnfollow = await User.findById(req.params.userId);
+    const currentUser = await User.findById(req.body.currentUserId);
+
+    if (!userToUnfollow || !currentUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    await currentUser.unfollow(userToUnfollow._id);
+    await userToUnfollow.updateOne({ $pull: { followers: currentUser._id } });
+
+    res.json({ message: 'Successfully unfollowed user' });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
 
 module.exports = router;

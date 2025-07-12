@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, scale } from 'framer-motion'
 
 const LandingAnimation = ({ mode }) => {
   const [showAnimation, setShowAnimation] = useState(true)
@@ -7,35 +7,83 @@ const LandingAnimation = ({ mode }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowAnimation(false)
-    }, 1700) // 1.5 seconds
-
+    }, 2300)
     return () => clearTimeout(timer)
   }, [])
 
-  // Set classes based on mode
-  const bgClass = mode === 'dark' ? 'bg-gray-900' : 'bg-white'
-  const textMain = mode === 'dark' ? 'text-green-400' : 'text-green-600'
-  const textSpan = mode === 'dark' ? 'text-white' : 'text-black'
+  // Colors
+  const bgClass = mode === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
+  const textMain = mode === 'dark' ? 'text-emerald-400' : 'text-emerald-600'
+  const textSecondary = mode === 'dark' ? 'text-gray-300' : 'text-gray-800'
+
+  // Create background text elements (now more visible)
+  const backgroundLines = Array.from({ length: 16 }, (_, i) => i)
 
   return (
     <AnimatePresence>
       {showAnimation && (
         <motion.div
-          className={`w-screen h-screen flex items-center justify-center ${bgClass} fixed top-0 left-0 z-50`}
-          initial={{ opacity: 1 }} //scale: 0.2 
-          animate={{ opacity: 2 }} //scale: 1
-          exit={{ opacity: 0 }} //scale: 1.1
-          transition={{ duration: 1.2 }}
+          className={`w-screen h-screen fixed top-0 left-0 z-50 overflow-hidden ${bgClass}`}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
         >
-          <motion.h1
-            className={`${textMain} font-extrabold text-3xl`}
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1,scale:2 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-          >
-            Quicker
-            <span className={textSpan}>Notes</span>
-          </motion.h1>
+          {/* VISIBLE Background lines - increased opacity */}
+          <div className="absolute inset-0 overflow-hidden">
+            {backgroundLines.map((line) => (
+              <motion.div
+                key={line}
+                className={`absolute ${textSecondary} font-mono whitespace-nowrap font-bold text-2xl opacity-40`} // Increased size and opacity
+                style={{
+                  top: `${(line + 1) * 6}%`,
+                  left: '100%',
+                }}
+                initial={{ x: 0 }}
+                animate={{
+                  x: '-300%',
+                  transition: {
+                    duration: 20 + Math.random() * 10,
+                    ease: "linear",
+                    repeat: Infinity,
+                    // delay: Math.random() * 2
+                    delay: -3
+                  }
+                }}
+              >
+                QuickerNotes!! • QuickerNotes!! • QuickerNotes!! • QuickerNotes!! • QuickerNotes!! • QuickerNotes!! •  QuickerNotes!! • QuickerNotes!! • QuickerNotes!! • QuickerNotes!! • QuickerNotes!! • QuickerNotes!! • QuickerNotes!! • QuickerNotes!! • QuickerNotes!! • QuickerNotes!! •  QuickerNotes!! • QuickerNotes!! • QuickerNotes!! • QuickerNotes!! • QuickerNotes!! • QuickerNotes!! • QuickerNotes!! • QuickerNotes!! • QuickerNotes!! • QuickerNotes!! • QuickerNotes!! • QuickerNotes!! • QuickerNotes!! • QuickerNotes!! • QuickerNotes!! • QuickerNotes!! •
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Main centered text */}
+          <div className="w-full h-full flex items-center justify-center relative z-10">
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0, exit: { scale: 40 } }}
+              animate={{
+                scale: [1, 1.1, 1, 1.05, 60], // Jiggle sequence
+                opacity: 1,
+                transition: {
+                  scale: {
+                    duration: 2.5,
+                    repeat: Infinity,
+                    repeatType: "loop",
+                    ease: "easeInOut"
+                  },
+                  opacity: 0
+                }
+              }}
+              className="text-center"
+            >
+              <motion.h1
+                className={`${textMain} font-bold text-6xl md:text-8xl tracking-tighter drop-shadow-lg`}
+                whileHover={{ scale: 1.05 }} // Extra interaction
+              >
+                Quicker
+                <span className={mode === 'dark' ? 'text-gray-200' : 'text-gray-800'}>
+                  Notes
+                </span>
+              </motion.h1>
+            </motion.div>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>

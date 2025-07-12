@@ -15,14 +15,14 @@ const CreateNote = ({ mode }) => {
   const [showCaseButtons, setShowCaseButtons] = useState(false);
   const contentTextareaRef = useRef(null);
   const [category, setCategory] = useState("private");
-  const { wordCount, readingTime } = useMemo(() => {
-    const trimmedContent = content.trim();
-    const words = trimmedContent === "" ? [] : trimmedContent.split(/\s+/);
-    return {
-      wordCount: words.length,
-      readingTime: Math.ceil(words.length / 200) // 200 WPM
-    };
-  }, [content]);
+  // const { wordCount, readingTime } = useMemo(() => {
+  //   const trimmedContent = content.trim();
+  //   const words = trimmedContent === "" ? [] : trimmedContent.split(/\s+/);
+  //   return {
+  //     wordCount: words.length,
+  //     readingTime: Math.ceil(words.length / 200) // 200 WPM
+  //   };
+  // }, [content]);
   useEffect(() => {
     if (!localStorage.getItem("currentUser")) {
       toast.error("Login required");
@@ -193,14 +193,14 @@ const CreateNote = ({ mode }) => {
                 }`}
             ></textarea>
           </div>
-          <div className='flex gap-10'>
+          {/* <div className='flex gap-10'>
             <h3 className='text-sm text-gray-400'>
               Word count -{"> "} {wordCount}
             </h3>
             <h3 className='text-sm text-gray-400'>
               Reading time -{"> "} {readingTime}
             </h3>
-          </div>
+          </div> */}
           <button
             type="submit"
             className={`w-full py-2 rounded-md transition font-medium ${mode === "dark"

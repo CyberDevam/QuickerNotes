@@ -58,7 +58,7 @@ const ViewNote = ({ mode, toggleMode }) => {
               ? "bg-gray-800 border-gray-700" 
               : "bg-white border-gray-200"
           } border`}>
-            <h1 className={`text-xl sm:text-3xl font-bold mb-4 text-center sm:text-left break-words ${
+            <h1 className={`text-xl m-2 sm:text-3xl font-bold mb-4 text-center sm:text-left break-words ${
               mode === "dark" ? "text-green-400" : "text-green-700"
             }`}>
               {note.title}

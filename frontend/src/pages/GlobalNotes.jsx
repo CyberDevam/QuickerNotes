@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import FloatingCreateButton from '../components/FloatingCreateButton';
+import { globalNotes, IdentifyMe } from '../Routes/apiRoutes';
 
 const GlobalNotes = ({ mode }) => {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ const GlobalNotes = ({ mode }) => {
   useEffect(() => {
     const fetchPublicNotes = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/note/global/public');
+        const response = await axios.get(globalNotes);
         if (response.status === 200) {
           setPublicNotes(response.data);
 
@@ -25,7 +26,7 @@ const GlobalNotes = ({ mode }) => {
           // Fetch user names in parallel
           const userResponses = await Promise.all(
             uniqueUserIds.map(id =>
-              axios.get(`http://localhost:3000/auth/${id}`).then(res => ({
+              axios.get(`${IdentifyMe}${id}`).then(res => ({
                 id,
                 name: res.data.name || res.data.username || 'Anonymous'
               })).catch(() => ({
@@ -65,7 +66,10 @@ const GlobalNotes = ({ mode }) => {
     (note.content && note.content.toLowerCase().includes(searchTerm.toLowerCase()))
   ) : publicNotes;
   return (
-    <div className={`max-h-[94.5vh] sticky h-[94.7vh] min-h-[94.8vh] py-8 ${mode === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-800'}`}>
+    <div style={{
+      borderTopLeftRadius: "10px",
+      borderTopRightRadius: "10px"
+    }} className={`max-h-[94.5vh] sticky h-[94.7vh] min-h-[94.8vh] py-8 ${mode === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-800'}`}>
       <FloatingCreateButton />
       <div className="container mx-auto px-4">
         <div className='flex items-start justify-between w-full'>

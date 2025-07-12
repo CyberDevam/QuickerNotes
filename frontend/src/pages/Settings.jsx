@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
+import { palette } from '../Routes/apiRoutes';
 const Settings = ({ mode, buttonPalette, setButtonPalette }) => {
   const currentUser = JSON.parse(localStorage.getItem("currentUser"));
   const palettes = {
@@ -164,7 +165,7 @@ const Settings = ({ mode, buttonPalette, setButtonPalette }) => {
     try {
       setButtonPalette(selectedPalette);
       const response = await axios.post(
-        "http://localhost:3000/auth/palette/" + currentUser._id,
+        palette + currentUser._id,
         {
           category: selectedPalette,
           palette: palettes[selectedPalette],
