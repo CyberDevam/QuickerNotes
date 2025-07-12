@@ -22,7 +22,6 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setGender("male");
     console.log(name,email,password,gender);
     if (!name || !email || !password || !gender) {
       toast.error("All Credentials Are Required");
@@ -152,7 +151,6 @@ const Register = () => {
               placeholder="example@you.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
               className="mt-1 w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-green-400"
             />
           </div>

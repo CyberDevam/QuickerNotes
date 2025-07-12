@@ -1,4 +1,4 @@
-const url = "https://quickernotes-backend.onrender.com";
+const url = "http://localhost:3000";
 export const LoginRoutes = url+"/auth/login";
 export const RegisterRoutes = url+"/auth/register";
 export const fetchNoteS = url+"/note?userId=";
