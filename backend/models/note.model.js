@@ -8,11 +8,16 @@ const noteSchema = new mongoose.Schema({
   },
   title: String,
   content: String,
+  
   category: {
     type: String,
     enum: ["public", "private"],
     default: "private"
-  }
+  },
+  likes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
+  }]
 }, { timestamps: true });
 
 module.exports = mongoose.model("Note", noteSchema);

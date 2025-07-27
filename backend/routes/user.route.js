@@ -7,30 +7,37 @@ const userModel = require('../models/user.model');
 //identify me
 router.get("/:id", async (req, res) => {
   const id = req.params.id;
+  // console.log(id);
   try {
-    const user = await User.findById(id);
+    const user = await User.findById(id).populate('followers following', 'name email avatar');
+    ;
     if (!user) {
       return res.status(400).json({ isMe: false });
     }
-    res.status(200).json({ isMe: true, email: user.email, name: user.name, _id: user._id, avatarImg: user.avatarImg, gender: user.gender });
+    res.status(200).json({ isMe: true, email: user.email, name: user.name, _id: user._id, avatarImg: user.avatarImg, gender: user.gender, user });
   } catch (error) {
     res.status(500).json(error);
   }
 });
-// New route to get user details
-router.get("/user/:id", async (req, res) => {
+router.get("/search/:name", async (req, res) => {
   try {
-    const user = await User.findById(req.params.id)
-      .select("-password -palette -mode -email")
+    const { name } = req.params;
 
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-    res.status(200).json(user);
-  } catch (err) {
-    res.status(500).json({ error: "Server error" });
+    const users = await userModel
+      .find(
+        name
+          ? { name: { $regex: name, $options: "i" } }
+          : {} // if no query, return all
+      )
+      .select("-password");
+
+    return res.status(200).json({ users });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error, message: "Internal server error" });
   }
 });
+
 // Pallete
 router.post("/palette/:id", async (req, res) => {
   const id = req.params.id;
@@ -116,6 +123,7 @@ router.get("/avatar/:id", async (req, res) => {
 router.put("/profile/:id", async (req, res) => {
   const id = req.params.id;
   const { name, email, currentPassword, newPassword, confirmPassword } = req.body;
+  console.log(name, email, currentPassword, newPassword, confirmPassword);
   if (!name || !email || !currentPassword || !newPassword || !confirmPassword) {
     return res.status(400).json({ message: "fields are empty" });
   }
@@ -205,6 +213,7 @@ router.get("/logout", async (req, res) => {
     res.status(400).json({ message: "Logout Unsuccessfull" })
   }
 });
+// follow user
 router.post('/:userId/follow', async (req, res) => {
   try {
     const userToFollow = await User.findById(req.params.userId);
@@ -216,13 +225,12 @@ router.post('/:userId/follow', async (req, res) => {
 
     await currentUser.follow(userToFollow._id);
     await userToFollow.updateOne({ $push: { followers: currentUser._id } });
-
-    res.json({ message: 'Successfully followed user' });
+    const user = await User.findById(req.body.currentUserId);
+    res.json({ message: 'Successfully followed user' }, user);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 });
-
 // Unfollow a user
 router.post('/:userId/unfollow', async (req, res) => {
   try {
@@ -232,11 +240,10 @@ router.post('/:userId/unfollow', async (req, res) => {
     if (!userToUnfollow || !currentUser) {
       return res.status(404).json({ error: 'User not found' });
     }
-
     await currentUser.unfollow(userToUnfollow._id);
     await userToUnfollow.updateOne({ $pull: { followers: currentUser._id } });
-
-    res.json({ message: 'Successfully unfollowed user' });
+    const user = await User.findById(req.body.currentUserId);
+    res.json({ message: 'Successfully unfollowed user' }, user);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

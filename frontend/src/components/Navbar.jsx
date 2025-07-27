@@ -10,7 +10,8 @@ const Navbar = ({ mode, toggleMode }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [userName, setUserName] = useState(currentUser?.name || "");
-
+  const [toSearch, setToSearch] = useState(false);
+  const [user, setUser] = useState({});
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
@@ -30,6 +31,7 @@ const Navbar = ({ mode, toggleMode }) => {
           const response = await axios.get(`${IdentifyMe}${currentUser._id}`);
           if (response.status === 200 && response.data.name) {
             setUserName(response.data.name);
+            await setUser(response.data);
           }
         } catch (error) {
           console.error("Error fetching user name:", error);
@@ -218,7 +220,16 @@ const Navbar = ({ mode, toggleMode }) => {
               to="/"
               className="flex items-center text-emerald-600 hover:text-emerald-700 transition-colors dark:text-emerald-400 dark:hover:text-emerald-300"
             >
-              <svg
+              <motion.svg
+                initial={{
+                  opacity: 0, y: 10
+                }}
+                animate={{
+                  opacity: 1, y: 0
+                }}
+                transition={{
+                  duration: 0.3
+                }}
                 className="w-6 h-6"
                 fill="none"
                 stroke="currentColor"
@@ -230,13 +241,21 @@ const Navbar = ({ mode, toggleMode }) => {
                   strokeLinejoin="round"
                   d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 9l5-5 5 5M12 4.5V16"
                 />
-              </svg>
-              <span className="font-bold text-xl ml-2">
+              </motion.svg>
+              <motion.span initial={{
+                opacity: 0, y: 10
+              }}
+                animate={{
+                  opacity: 1, y: 0
+                }}
+                transition={{
+                  duration: 0.3
+                }} className="font-bold text-xl ml-2">
                 Quicker
                 <span className={mode === "dark" ? "text-gray-200" : "text-gray-800"}>
                   Notes
                 </span>
-              </span>
+              </motion.span>
             </Link>
           </div>
 
@@ -268,10 +287,25 @@ const Navbar = ({ mode, toggleMode }) => {
               </Link>
             </motion.div>
           )}
-
           {/* Navigation Items - Only shows on desktop */}
           {currentUser && !isMobile && (
-            <div className="flex items-center space-x-4">
+            <motion.div initial={{
+              opacity: 0, y: 10
+            }}
+              animate={{
+                opacity: 1, y: 0
+              }}
+              transition={{
+                duration: 0.3
+              }} className="flex items-center space-x-4">
+              {/* Search User */}
+              <Link to="/search">
+                <button
+                  className={`relative bg-transparent ${mode === "dark" ? "hover:text-gray-900 bg-white" : "hover:bg-gray-100"} p-2 text-gray-600 px-4 rounded-full transition-colors dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700`}
+                >
+                  search
+                </button>
+              </Link>
               <Link
                 to="setting"
                 className={`${mode === "dark" ? "hover:text-gray-900 bg-white" : "hover:bg-gray-100"} p-2 text-gray-600   rounded-full transition-colors dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700`}
@@ -361,10 +395,19 @@ const Navbar = ({ mode, toggleMode }) => {
                     : "bg-emerald-100 text-emerald-600 hover:bg-emerald-200"
                     }`}
                 >
-                  {userName.charAt(0).toUpperCase()}
+                  <img
+                    src={
+                      user.avatarImg ||
+                      `https://avatar.iran.liara.run/public/boy?username=${encodeURIComponent(
+                        user.name || "User"
+                      )}`
+                    }
+                    alt={userName.charAt(0).toUpperCase()}
+
+                  />
                 </div>
               </Link>
-            </div>
+            </motion.div>
           )}
         </div>
       </nav>

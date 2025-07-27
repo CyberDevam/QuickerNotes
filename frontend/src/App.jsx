@@ -16,16 +16,20 @@ import LandingPage from "./pages/LandingPage";
 import LearnMore from "./pages/LearnMore";
 import NotFound from "./pages/NotFound";
 import GlobalNotes from "./pages/GlobalNotes";
+import FloatingCreateButton from "./components/FloatingCreateButton";
+import Followers from "./pages/Followers";
 import Following from "./pages/Following";
+import Search from "./pages/Search";
+// import Following from "./pages/Following";
 
 const App = () => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const [buttonPalette, setButtonPalette] = useState('professional');
-  const [landingAnimation, setLandingAnimation] = useState(true);
+  const [landingAnimation, setLandingAnimation] = useState(false);
   const [mode, setMode] = useState("light"); // Default fallback
   const [loadingMode, setLoadingMode] = useState(true);
-
+  const [addNoteBtn, setAddNoteBtn] = useState(false);
   // Fetch mode from backend
   const fetchMode = async (userId) => {
     try {
@@ -64,7 +68,7 @@ const App = () => {
         const parsedUser = JSON.parse(storedUser);
         setUser(parsedUser);
         await fetchMode(parsedUser._id);
-        
+        await setAddNoteBtn(true);
         // Redirect if on auth pages
         const path = window.location.pathname;
         if (path === "/login" || path === "/register") {
@@ -80,11 +84,11 @@ const App = () => {
 
   const toggleMode = async () => {
     const newMode = mode === "light" ? "dark" : "light";
-    
+
     // Optimistic UI update
     setMode(newMode);
     document.documentElement.classList.toggle("dark", newMode === "dark");
-    
+
     // Update backend if user is logged in
     if (user?._id) {
       try {
@@ -99,18 +103,17 @@ const App = () => {
     localStorage.setItem("buttonPalette", buttonPalette);
   }, [buttonPalette]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLandingAnimation(false);
-    }, 2500);
-    return () => clearTimeout(timer);
-  }, []);
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     setLandingAnimation(false);
+  //   }, 2500);
+  //   return () => clearTimeout(timer);
+  // }, []);
 
   if (loadingMode) {
     return (
-      <div className={`flex items-center justify-center h-screen ${
-        mode === "dark" ? "bg-gray-900 text-white" : "bg-white text-gray-900"
-      }`}>
+      <div className={`flex items-center justify-center h-screen ${mode === "dark" ? "bg-gray-900 text-white" : "bg-white text-gray-900"
+        }`}>
         Loading theme...
       </div>
     );
@@ -118,6 +121,7 @@ const App = () => {
 
   return (
     <div className={mode === "dark" ? "dark" : ""}>
+      {addNoteBtn && <FloatingCreateButton />}
       <Toaster position="left" />
       {landingAnimation ? (
         <LandingAnimation mode={mode} />
@@ -129,24 +133,25 @@ const App = () => {
             <Route path="/register" element={<Register mode={mode} toggleMode={toggleMode} />} />
             <Route path="/" element={<ShowAllNotes mode={mode} />} />
             <Route path="/setting" element={
-              <Settings 
-                mode={mode} 
-                buttonPalette={buttonPalette} 
-                setButtonPalette={setButtonPalette} 
+              <Settings
+                mode={mode}
+                buttonPalette={buttonPalette}
+                setButtonPalette={setButtonPalette}
               />
             } />
-            <Route path="/learnmore" element={<LearnMore mode={mode}/>} />
-            <Route path="/global" element={<GlobalNotes mode={mode}/>} />
-            <Route path="/landing" element={<LandingPage mode={mode}/>} />
+            <Route path="/search" element={<Search mode={mode} />} />
+            <Route path="/learnmore" element={<LearnMore mode={mode} />} />
+            <Route path="/global" element={<GlobalNotes mode={mode} />} />
+            <Route path="/landing" element={<LandingPage mode={mode} />} />
             <Route path="/create" element={<CreateNote mode={mode} />} />
             <Route path="/edit" element={<EditNote mode={mode} />} />
             <Route path="/view" element={<ViewNote mode={mode} />} />
             <Route path="/profile" element={<ProfilePage mode={mode} />} />
-            <Route path={`/users/followers`} element={<ProfilePage mode={mode} />} />
-            <Route path={`/users/following`} element={<Following mode={mode} />} />
+            <Route path="/profile/followers" element={<Followers mode={mode} />} />
+            <Route path="/profile/following" element={<Following mode={mode} />} />
             <Route
               path="*"
-              element={<NotFound/>}
+              element={<NotFound />}
             />
           </Routes>
         </>
